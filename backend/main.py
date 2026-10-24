@@ -3,11 +3,20 @@ import json
 import os
 import sys
 import traceback
+import types
 
-# Ensure both service directory and parent repository root are in sys.path
+# When deployed as a standalone service with root="backend",
+# the current directory contains models/, services/, etc. directly.
+# Aliasing this directory as the 'backend' package in sys.modules allows
+# all internal 'from backend.xxx import yyy' statements to resolve seamlessly!
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-_parent = os.path.dirname(_this_dir)
-for _p in (_parent, _this_dir):
+if "backend" not in sys.modules:
+    backend_pkg = types.ModuleType("backend")
+    backend_pkg.__path__ = [_this_dir]
+    backend_pkg.__file__ = os.path.join(_this_dir, "__init__.py")
+    sys.modules["backend"] = backend_pkg
+
+for _p in (_this_dir, os.path.dirname(_this_dir)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 

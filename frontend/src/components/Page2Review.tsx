@@ -9,6 +9,7 @@ import {
   Check,
   Upload,
   X,
+  CheckCircle2,
 } from "lucide-react";
 import type { EditableQuestion, ExamParseResponse, QuestionType } from "../services/analyzer";
 import { parseAnswerKeyText } from "../utils/answerKeyParser";
@@ -178,24 +179,26 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--s3)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* Title & Stats */}
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: "var(--s2)" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: "16px" }}>
         <div>
-          <span className="section-eyebrow">Stage 02</span>
-          <h2>Review extracted questions and keys</h2>
-          <p style={{ marginTop: "4px", maxWidth: "65ch" }}>
-            Verify question stems and options. Click any choice to designate it as the official answer key for validation.
+          <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-primary)" }}>
+            Review Extracted Questions &amp; Assign Keys
+          </h2>
+          <p style={{ color: "var(--ink-secondary)", fontSize: "0.9rem", marginTop: "4px" }}>
+            Click any answer choice or use the Import button to map official answers (e.g. 1.a, 2.B, 3.d, 4.f, 5.T).
           </p>
         </div>
       </div>
 
       {/* Success Notice for Key Import / Clearing */}
       {keySuccessNotice && (
-        <div className="callout callout-ok">
-          <Check size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
+        <div className="callout" style={{ backgroundColor: "#ECFDF5", border: "1px solid #A7F3D0", color: "#065F46" }}>
+          <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
           <div>
-            <strong>Answer key updated:</strong> {keySuccessNotice}
+            <strong style={{ display: "block", fontSize: "0.85rem" }}>Answer Key Updated</strong>
+            <span>{keySuccessNotice}</span>
           </div>
         </div>
       )}
@@ -205,57 +208,57 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
         <div className="callout callout-warning" role="alert">
           <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
           <div>
-            <strong style={{ display: "block", marginBottom: "2px" }}>Scanned document notice</strong>
+            <strong style={{ display: "block", fontSize: "0.85rem" }}>Scanned Document Notice</strong>
             <span>{parsedData.extractionWarning}</span>
           </div>
         </div>
       )}
 
-      {/* Summary Stats Strip (1px border cards, no shadows) */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "var(--s2)" }}>
-        <div className="panel" style={{ padding: "var(--s2)" }}>
-          <div style={{ fontSize: "13px", color: "var(--ink-3)", marginBottom: "2px" }}>Total questions</div>
-          <div className="mono-num" style={{ fontSize: "var(--fs-md)", fontWeight: 700 }}>{totalQuestions}</div>
+      {/* Summary Stats Strip */}
+      <div className="stats-summary-bar">
+        <div className="stat-cell">
+          <div className="stat-cell-label">Total Questions</div>
+          <div className="stat-cell-value">{totalQuestions}</div>
         </div>
-        <div className="panel" style={{ padding: "var(--s2)" }}>
-          <div style={{ fontSize: "13px", color: "var(--ink-3)", marginBottom: "2px" }}>Multiple choice</div>
-          <div className="mono-num" style={{ fontSize: "var(--fs-md)", fontWeight: 700 }}>{mcqCount}</div>
+        <div className="stat-cell">
+          <div className="stat-cell-label">Multiple Choice</div>
+          <div className="stat-cell-value">{mcqCount}</div>
         </div>
-        <div className="panel" style={{ padding: "var(--s2)" }}>
-          <div style={{ fontSize: "13px", color: "var(--ink-3)", marginBottom: "2px" }}>True / False</div>
-          <div className="mono-num" style={{ fontSize: "var(--fs-md)", fontWeight: 700 }}>{tfCount}</div>
+        <div className="stat-cell">
+          <div className="stat-cell-label">True / False</div>
+          <div className="stat-cell-value">{tfCount}</div>
         </div>
-        <div className="panel" style={{ padding: "var(--s2)" }}>
-          <div style={{ fontSize: "13px", color: "var(--ink-3)", marginBottom: "2px" }}>Official answer keys</div>
-          <div className="mono-num" style={{ fontSize: "var(--fs-md)", fontWeight: 700, color: keysCount > 0 ? "var(--ok)" : "var(--ink-3)" }}>
+        <div className="stat-cell">
+          <div className="stat-cell-label">Official Answer Key</div>
+          <div className="stat-cell-value" style={{ color: keysCount > 0 ? "var(--color-success)" : "var(--ink-tertiary)" }}>
             {keysCount} / {totalQuestions}
           </div>
         </div>
         {needsReviewCount > 0 && (
-          <div className="panel" style={{ padding: "var(--s2)", borderColor: "var(--warn-border)", backgroundColor: "var(--warn-bg)" }}>
-            <div style={{ fontSize: "13px", color: "var(--warn)", marginBottom: "2px" }}>Needs review</div>
-            <div className="mono-num" style={{ fontSize: "var(--fs-md)", fontWeight: 700, color: "var(--warn)" }}>{needsReviewCount}</div>
+          <div className="stat-cell" style={{ backgroundColor: "var(--blaze-orange-tint)" }}>
+            <div className="stat-cell-label" style={{ color: "var(--blaze-orange)" }}>Needs Review</div>
+            <div className="stat-cell-value" style={{ color: "var(--blaze-orange)" }}>{needsReviewCount}</div>
           </div>
         )}
       </div>
 
       {/* Filter and Key Actions Toolbar */}
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "var(--s2)" }}>
-        <div className="segmented-control" role="tablist" aria-label="Question filters">
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+        <div className="segmented-pills" role="tablist" aria-label="Question filters">
           <button
             type="button"
             role="tab"
             aria-selected={filterType === "all"}
-            className={`segmented-btn ${filterType === "all" ? "active" : ""}`}
+            className={`segmented-pill ${filterType === "all" ? "active" : ""}`}
             onClick={() => setFilterType("all")}
           >
-            All items ({questions.length})
+            All Items ({questions.length})
           </button>
           <button
             type="button"
             role="tab"
             aria-selected={filterType === "mcq"}
-            className={`segmented-btn ${filterType === "mcq" ? "active" : ""}`}
+            className={`segmented-pill ${filterType === "mcq" ? "active" : ""}`}
             onClick={() => setFilterType("mcq")}
           >
             MCQ ({mcqCount})
@@ -264,7 +267,7 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
             type="button"
             role="tab"
             aria-selected={filterType === "tf"}
-            className={`segmented-btn ${filterType === "tf" ? "active" : ""}`}
+            className={`segmented-pill ${filterType === "tf" ? "active" : ""}`}
             onClick={() => setFilterType("tf")}
           >
             True/False ({tfCount})
@@ -274,39 +277,39 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
               type="button"
               role="tab"
               aria-selected={filterType === "needs_review"}
-              className={`segmented-btn ${filterType === "needs_review" ? "active" : ""}`}
+              className={`segmented-pill ${filterType === "needs_review" ? "active" : ""}`}
               onClick={() => setFilterType("needs_review")}
             >
-              Needs review ({needsReviewCount})
+              Needs Review ({needsReviewCount})
             </button>
           )}
         </div>
 
-        <div style={{ display: "flex", gap: "var(--s1)", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-sm"
             onClick={() => setIsKeyModalOpen(true)}
-            style={{ minHeight: "36px", padding: "6px 12px", fontSize: "var(--fs-sm)" }}
+            title="Upload or paste an official answer key file"
           >
-            <Key size={14} />
-            <span>Import answer key</span>
+            <Key size={14} color="var(--blaze-orange)" />
+            <span>Import Answer Key</span>
           </button>
 
           {keysCount > 0 && (
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn btn-ghost btn-sm"
               onClick={handleClearAllKeys}
-              style={{ minHeight: "36px", padding: "6px 12px", fontSize: "var(--fs-sm)" }}
+              title="Clear all assigned keys"
             >
-              <span>Clear keys</span>
+              <span>Clear Keys</span>
             </button>
           )}
 
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-sm"
             onClick={() => {
               const nextIndex = questions.length + 1;
               const newQ: EditableQuestion = {
@@ -322,16 +325,15 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
               };
               setQuestions([...questions, newQ]);
             }}
-            style={{ minHeight: "36px", padding: "6px 12px", fontSize: "var(--fs-sm)" }}
           >
             <Plus size={14} />
-            <span>Add question</span>
+            <span>Add Question</span>
           </button>
         </div>
       </div>
 
       {/* Question Cards List */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--s2)" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         {filteredQuestions.map((q) => {
           const qKey = q.number || String(q.index);
           const currentKey = officialKeys[qKey] || "";
@@ -340,16 +342,12 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
           return (
             <div
               key={q.id}
-              className="panel"
-              style={{
-                padding: "var(--s3)",
-                borderColor: hasWarning ? "var(--warn-border)" : "var(--border)",
-              }}
+              className={`question-review-card ${hasWarning ? "has-warning" : ""}`}
             >
               {/* Card Header */}
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "var(--s1)", marginBottom: "var(--s2)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--s1)" }}>
-                  <span className="mono-num" style={{ fontWeight: 700, padding: "2px 8px", backgroundColor: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span className="pill pill-dark">
                     #{q.number || q.index}
                   </span>
 
@@ -358,13 +356,12 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                     onChange={(e) => handleTypeChange(q.id, e.target.value as QuestionType)}
                     aria-label={`Question type for item ${q.number || q.index}`}
                     style={{
-                      fontFamily: "var(--font-ui)",
-                      fontSize: "var(--fs-sm)",
-                      padding: "4px 8px",
-                      borderRadius: "var(--radius)",
-                      border: "1px solid var(--border)",
-                      backgroundColor: "var(--bg)",
-                      color: "var(--ink)",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "0.78rem",
+                      padding: "3px 8px",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid var(--border-medium)",
+                      background: "var(--bg-surface)",
                     }}
                   >
                     <option value="mcq">Multiple Choice</option>
@@ -372,17 +369,17 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                   </select>
 
                   {q.warnings.length > 0 && (
-                    <span className="badge-delta neg" style={{ fontSize: "12px" }}>
-                      {q.warnings[0]}
+                    <span className="pill pill-orange">
+                      ⚠ {q.warnings[0]}
                     </span>
                   )}
                 </div>
 
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn-danger-ghost btn-sm"
                   onClick={() => handleDeleteQuestion(q.id)}
-                  style={{ minHeight: "32px", padding: "4px 8px", fontSize: "13px", color: "var(--risk)", borderColor: "var(--border)" }}
+                  title="Delete question"
                 >
                   <Trash2 size={13} />
                   <span>Delete</span>
@@ -390,36 +387,45 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
               </div>
 
               {/* Stem Input */}
-              <div style={{ marginBottom: "var(--s2)" }}>
+              <div style={{ marginBottom: "14px" }}>
                 <textarea
-                  className="form-textarea"
                   value={q.questionText}
                   onChange={(e) => handleStemChange(q.id, e.target.value)}
                   rows={2}
                   aria-label={`Question stem for item ${q.number || q.index}`}
-                  style={{ backgroundColor: "var(--bg)" }}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    border: "1px solid var(--border-light)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "8px 12px",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "0.92rem",
+                    lineHeight: 1.5,
+                    background: "var(--bg-canvas)",
+                  }}
                 />
               </div>
 
-              {/* Choices (MCQ only) - Clickable row to toggle official key */}
+              {/* Choices (MCQ only) - DIRECTLY CLICKABLE */}
               {q.type === "mcq" && (
-                <div style={{ marginBottom: "var(--s2)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--s1)" }}>
-                    <span style={{ fontSize: "13px", color: "var(--ink-3)", fontWeight: 500 }}>
-                      Answer choices ({q.choices.length}) — Click row to designate as official key
+                <div style={{ marginBottom: "14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--ink-tertiary)", textTransform: "uppercase" }}>
+                      Answer Choices ({q.choices.length}) — Click row or letter to set official key
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAddChoice(q.id)}
-                      className="btn btn-secondary"
-                      style={{ minHeight: "28px", padding: "2px 8px", fontSize: "12px" }}
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: "2px 6px", fontSize: "0.75rem" }}
                     >
                       <Plus size={12} />
-                      <span>Add option</span>
+                      <span>Add Option</span>
                     </button>
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div>
                     {q.choices.map((choice, cIdx) => {
                       const letter = String.fromCharCode(65 + cIdx);
                       const isSelected = currentKey.toUpperCase() === letter;
@@ -427,61 +433,49 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                       return (
                         <div
                           key={cIdx}
-                          className={`choice-btn ${isSelected ? "selected-key" : ""}`}
+                          className={`choice-edit-row ${isSelected ? "selected-key" : ""}`}
                           onClick={() => handleKeyChange(qKey, letter)}
                           title={`Click to set option ${letter} as official answer key`}
                         >
-                          <div style={{ display: "flex", alignItems: "center", gap: "var(--s1)", flex: 1 }}>
-                            <span
-                              className="mono-num"
-                              style={{
-                                width: "28px",
-                                height: "28px",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                border: isSelected ? "1px solid var(--ok)" : "1px solid var(--border)",
-                                borderRadius: "var(--radius)",
-                                backgroundColor: isSelected ? "var(--ok-bg)" : "var(--bg)",
-                                color: isSelected ? "var(--ok)" : "var(--ink)",
-                                fontWeight: 700,
-                              }}
-                            >
-                              {letter}
-                            </span>
-                            <input
-                              type="text"
-                              className="form-input"
-                              value={choice}
-                              aria-label={`Option ${letter} for question ${q.number || q.index}`}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) => handleChoiceChange(q.id, cIdx, e.target.value)}
-                              style={{ minHeight: "36px", padding: "6px 10px", fontSize: "var(--fs-sm)" }}
-                            />
+                          <div
+                            className={`choice-radio-indicator ${isSelected ? "checked" : ""}`}
+                            aria-hidden="true"
+                          >
+                            {isSelected && <div className="choice-radio-dot" />}
                           </div>
 
-                          <div style={{ display: "flex", alignItems: "center", gap: "var(--s1)", marginLeft: "var(--s2)" }}>
-                            {isSelected && (
-                              <span className="badge-delta pos" style={{ fontSize: "12px" }}>
-                                <Check size={12} style={{ marginRight: "3px" }} />
-                                Key
-                              </span>
-                            )}
-                            {q.choices.length > 2 && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveChoice(q.id, cIdx);
-                                }}
-                                className="btn btn-secondary"
-                                style={{ minHeight: "28px", padding: "2px 6px", fontSize: "12px", border: "none" }}
-                                title="Delete option"
-                              >
-                                <Trash2 size={13} color="var(--ink-3)" />
-                              </button>
-                            )}
-                          </div>
+                          <span className="choice-letter-badge">{letter}</span>
+
+                          <input
+                            type="text"
+                            className="choice-input"
+                            value={choice}
+                            aria-label={`Option ${letter} for question ${q.number || q.index}`}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => handleChoiceChange(q.id, cIdx, e.target.value)}
+                          />
+
+                          {isSelected && (
+                            <span className="pill pill-lime" style={{ flexShrink: 0, fontSize: "0.72rem" }}>
+                              <Check size={12} />
+                              Key
+                            </span>
+                          )}
+
+                          {q.choices.length > 2 && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveChoice(q.id, cIdx);
+                              }}
+                              className="btn btn-ghost btn-sm"
+                              style={{ padding: "4px", color: "var(--ink-tertiary)" }}
+                              title="Delete option"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
                         </div>
                       );
                     })}
@@ -489,37 +483,51 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                 </div>
               )}
 
-              {/* Choices (True / False only) */}
+              {/* Choices (True / False only) - DIRECTLY CLICKABLE CARDS */}
               {q.type === "tf" && (
-                <div style={{ marginBottom: "var(--s2)" }}>
-                  <span style={{ fontSize: "13px", color: "var(--ink-3)", fontWeight: 500, display: "block", marginBottom: "var(--s1)" }}>
-                    Click True or False to designate official key
+                <div style={{ marginBottom: "14px" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--ink-tertiary)", textTransform: "uppercase", display: "block", marginBottom: "6px" }}>
+                    Click True or False to Set Official Key
                   </span>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--s2)" }}>
+                  <div className="tf-choice-grid">
                     <div
-                      className={`choice-btn ${currentKey === "True" ? "selected-key" : ""}`}
+                      className={`tf-choice-card ${currentKey === "True" ? "selected-key" : ""}`}
                       onClick={() => handleKeyChange(qKey, "True")}
                       role="button"
                       tabIndex={0}
+                      aria-label={`Set True as official key for question ${q.number || q.index}`}
                     >
-                      <strong style={{ fontSize: "var(--fs-sm)" }}>True</strong>
+                      <div className="tf-choice-label">
+                        <div className={`choice-radio-indicator ${currentKey === "True" ? "checked" : ""}`}>
+                          {currentKey === "True" && <div className="choice-radio-dot" />}
+                        </div>
+                        <span>True</span>
+                      </div>
                       {currentKey === "True" && (
-                        <span className="badge-delta pos" style={{ fontSize: "12px" }}>
-                          <Check size={12} style={{ marginRight: "3px" }} /> Key
+                        <span className="pill pill-lime" style={{ fontSize: "0.72rem" }}>
+                          <Check size={12} />
+                          Key
                         </span>
                       )}
                     </div>
 
                     <div
-                      className={`choice-btn ${currentKey === "False" ? "selected-key" : ""}`}
+                      className={`tf-choice-card ${currentKey === "False" ? "selected-key" : ""}`}
                       onClick={() => handleKeyChange(qKey, "False")}
                       role="button"
                       tabIndex={0}
+                      aria-label={`Set False as official key for question ${q.number || q.index}`}
                     >
-                      <strong style={{ fontSize: "var(--fs-sm)" }}>False</strong>
+                      <div className="tf-choice-label">
+                        <div className={`choice-radio-indicator ${currentKey === "False" ? "checked" : ""}`}>
+                          {currentKey === "False" && <div className="choice-radio-dot" />}
+                        </div>
+                        <span>False</span>
+                      </div>
                       {currentKey === "False" && (
-                        <span className="badge-delta pos" style={{ fontSize: "12px" }}>
-                          <Check size={12} style={{ marginRight: "3px" }} /> Key
+                        <span className="pill pill-lime" style={{ fontSize: "0.72rem" }}>
+                          <Check size={12} />
+                          Key
                         </span>
                       )}
                     </div>
@@ -527,17 +535,19 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                 </div>
               )}
 
-              {/* Official Key Indicator Row */}
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "var(--s1)", paddingTop: "var(--s1)", borderTop: "1px solid var(--border)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Key size={14} color="var(--ink-3)" />
-                  <span style={{ fontSize: "13px", color: "var(--ink-2)" }}>Official key:</span>
-                  <span className="mono-num" style={{ fontSize: "13px", fontWeight: 700, color: currentKey ? "var(--ok)" : "var(--ink-3)" }}>
-                    {currentKey || "(None assigned)"}
+              {/* Official Answer Key Indicator Row */}
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "10px", paddingTop: "10px", borderTop: "1px solid var(--border-light)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Key size={13} color="var(--blaze-orange)" />
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", fontWeight: 600, color: "var(--ink-secondary)" }}>
+                    Official Key:
+                  </span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", fontWeight: 700, color: currentKey ? "var(--color-success)" : "var(--ink-tertiary)" }}>
+                    {currentKey ? currentKey : "(None assigned)"}
                   </span>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   {q.type === "mcq" ? (
                     q.choices.map((_, cIdx) => {
                       const label = String.fromCharCode(65 + cIdx);
@@ -546,17 +556,8 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                         <button
                           key={label}
                           type="button"
-                          className="segmented-btn"
-                          style={{
-                            padding: "3px 8px",
-                            fontFamily: "var(--font-mono)",
-                            fontSize: "12px",
-                            fontWeight: isSelected ? 700 : 500,
-                            backgroundColor: isSelected ? "var(--ok-bg)" : "transparent",
-                            color: isSelected ? "var(--ok)" : "var(--ink-2)",
-                            border: isSelected ? "1px solid var(--ok-border)" : "1px solid var(--border)",
-                            borderRadius: "var(--radius)",
-                          }}
+                          className={`key-bubble ${isSelected ? "selected" : ""}`}
+                          aria-label={`Set ${label} as official key for question ${q.number || q.index}`}
                           onClick={() => handleKeyChange(qKey, label)}
                         >
                           {label}
@@ -567,32 +568,14 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                     <>
                       <button
                         type="button"
-                        className="segmented-btn"
-                        style={{
-                          padding: "3px 8px",
-                          fontSize: "12px",
-                          fontWeight: currentKey === "True" ? 700 : 500,
-                          backgroundColor: currentKey === "True" ? "var(--ok-bg)" : "transparent",
-                          color: currentKey === "True" ? "var(--ok)" : "var(--ink-2)",
-                          border: currentKey === "True" ? "1px solid var(--ok-border)" : "1px solid var(--border)",
-                          borderRadius: "var(--radius)",
-                        }}
+                        className={`key-tf-btn ${currentKey === "True" ? "selected" : ""}`}
                         onClick={() => handleKeyChange(qKey, "True")}
                       >
                         True
                       </button>
                       <button
                         type="button"
-                        className="segmented-btn"
-                        style={{
-                          padding: "3px 8px",
-                          fontSize: "12px",
-                          fontWeight: currentKey === "False" ? 700 : 500,
-                          backgroundColor: currentKey === "False" ? "var(--ok-bg)" : "transparent",
-                          color: currentKey === "False" ? "var(--ok)" : "var(--ink-2)",
-                          border: currentKey === "False" ? "1px solid var(--ok-border)" : "1px solid var(--border)",
-                          borderRadius: "var(--radius)",
-                        }}
+                        className={`key-tf-btn ${currentKey === "False" ? "selected" : ""}`}
                         onClick={() => handleKeyChange(qKey, "False")}
                       >
                         False
@@ -602,9 +585,10 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
                   {currentKey && (
                     <button
                       type="button"
-                      className="btn btn-secondary"
-                      style={{ minHeight: "26px", padding: "2px 6px", fontSize: "11px", marginLeft: "4px" }}
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: "2px 6px", fontSize: "0.72rem", color: "var(--ink-tertiary)" }}
                       onClick={() => handleKeyChange(qKey, currentKey)}
+                      title="Clear key for this question"
                     >
                       Clear
                     </button>
@@ -621,21 +605,21 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
         <div className="callout callout-warning" role="alert">
           <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
           <div>
-            <strong style={{ display: "block", marginBottom: "2px" }}>Validation notice</strong>
+            <strong style={{ display: "block", fontSize: "0.85rem" }}>Validation Notice</strong>
             <span>{validationError}</span>
           </div>
         </div>
       )}
 
       {/* Navigation Footer */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "var(--s2)", paddingTop: "var(--s3)", borderTop: "1px solid var(--border)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-light)" }}>
         <button className="btn btn-secondary" type="button" onClick={onBack}>
           <ArrowLeft size={16} />
-          <span>Back to upload</span>
+          <span>Back to Ingestion</span>
         </button>
 
         <button className="btn btn-primary" type="button" onClick={handleSubmit}>
-          <span>Simulate blind guessing</span>
+          <span>Run Blindfold Simulation</span>
           <ArrowRight size={16} />
         </button>
       </div>
@@ -643,114 +627,136 @@ export function Page2Review({ parsedData, onBack, onSubmit }: Props) {
       {/* Answer Key Import Modal */}
       {isKeyModalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.4)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "var(--s3)",
-            zIndex: 100,
-          }}
+          className="modal-overlay"
           onClick={() => setIsKeyModalOpen(false)}
           role="dialog"
           aria-modal="true"
+          aria-labelledby="modal-title"
         >
-          <div
-            className="panel-white"
-            style={{ maxWidth: "560px", width: "100%", padding: "var(--s4)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--s2)" }}>
-              <h3 style={{ margin: 0 }}>Import official answer key</h3>
+          <div className="key-import-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Key size={18} color="var(--blaze-orange)" />
+                <h3 id="modal-title" style={{ fontSize: "1.05rem", fontWeight: 700, margin: 0, color: "var(--ink-primary)" }}>
+                  Import Official Answer Key
+                </h3>
+              </div>
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={{ minHeight: "32px", padding: "4px 8px" }}
+                className="btn btn-ghost btn-sm"
                 onClick={() => setIsKeyModalOpen(false)}
+                aria-label="Close modal"
+                style={{ padding: "4px" }}
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <p style={{ fontSize: "var(--fs-sm)", marginBottom: "var(--s2)" }}>
-              Upload a text file or paste answers matching standard format (e.g. <code>1.A</code>, <code>2.B</code>, <code>3.True</code>, <code>4.False</code>).
-            </p>
+            <div className="modal-body">
+              <p style={{ fontSize: "0.86rem", color: "var(--ink-secondary)", margin: 0 }}>
+                Upload a text file or paste answers matching standard format (e.g. <code>1.a</code>, <code>2.B</code>, <code>3.d</code>, <code>4.f</code>, <code>5.T</code>).
+              </p>
 
-            <div style={{ display: "flex", gap: "var(--s1)", marginBottom: "var(--s2)" }}>
-              <input
-                type="file"
-                ref={keyFileInputRef}
-                accept=".txt,.csv,.key,.text"
-                style={{ display: "none" }}
-                onChange={handleKeyFileUpload}
-              />
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => keyFileInputRef.current?.click()}
-                style={{ minHeight: "36px", padding: "6px 12px", fontSize: "var(--fs-sm)" }}
-              >
-                <Upload size={14} />
-                <span>Upload .txt file</span>
-              </button>
-              {modalKeyText.trim() && (
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <input
+                  type="file"
+                  ref={keyFileInputRef}
+                  accept=".txt,.csv,.key,.text"
+                  style={{ display: "none" }}
+                  onChange={handleKeyFileUpload}
+                />
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setModalKeyText("")}
-                  style={{ minHeight: "36px", padding: "6px 12px", fontSize: "var(--fs-sm)" }}
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => keyFileInputRef.current?.click()}
                 >
-                  Clear
+                  <Upload size={14} />
+                  <span>Upload .txt File</span>
                 </button>
-              )}
+                {modalKeyText.trim() && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setModalKeyText("")}
+                  >
+                    Clear Input
+                  </button>
+                )}
+              </div>
+
+              <textarea
+                className="editor-textarea"
+                rows={7}
+                value={modalKeyText}
+                onChange={(e) => setModalKeyText(e.target.value)}
+                placeholder={"1.a\n2.B\n3.d\n4.f\n5.T"}
+                style={{ fontFamily: "var(--font-mono)", fontSize: "0.85rem" }}
+              />
+
+              {/* Live Detection Information */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  background: "var(--bg-subtle)",
+                  padding: "10px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-light)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "0.78rem",
+                      fontWeight: 600,
+                      color: liveKeyCount > 0 ? "var(--color-success)" : "var(--ink-tertiary)",
+                    }}
+                  >
+                    {liveKeyCount > 0
+                      ? `✓ ${liveKeyCount} answer key item(s) detected`
+                      : "Waiting for answer key input..."}
+                  </span>
+                </div>
+
+                {liveKeyCount > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxHeight: "80px", overflowY: "auto" }}>
+                    {Object.entries(liveParsedKeys).slice(0, 15).map(([num, ans]) => (
+                      <span
+                        key={num}
+                        className="pill pill-light"
+                        style={{ fontSize: "0.72rem", fontFamily: "var(--font-mono)" }}
+                      >
+                        Q{num}: <strong>{ans}</strong>
+                      </span>
+                    ))}
+                    {liveKeyCount > 15 && (
+                      <span className="pill pill-light" style={{ fontSize: "0.72rem" }}>
+                        +{liveKeyCount - 15} more
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <textarea
-              className="form-textarea"
-              rows={6}
-              value={modalKeyText}
-              onChange={(e) => setModalKeyText(e.target.value)}
-              placeholder={"1. B\n2. C\n3. B\n4. True\n5. False"}
-              style={{ marginBottom: "var(--s2)" }}
-            />
-
-            {liveKeyCount > 0 && (
-              <div className="panel" style={{ padding: "var(--s2)", marginBottom: "var(--s3)" }}>
-                <div style={{ fontSize: "var(--fs-sm)", fontWeight: 600, color: "var(--ok)", marginBottom: "4px" }}>
-                  ✓ {liveKeyCount} keys detected
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", maxHeight: "80px", overflowY: "auto" }}>
-                  {Object.entries(liveParsedKeys).slice(0, 12).map(([num, ans]) => (
-                    <span key={num} className="mono-num" style={{ fontSize: "12px", padding: "2px 6px", backgroundColor: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
-                      Q{num}: {ans}
-                    </span>
-                  ))}
-                  {liveKeyCount > 12 && (
-                    <span className="mono-num" style={{ fontSize: "12px", padding: "2px 6px", color: "var(--ink-3)" }}>
-                      +{liveKeyCount - 12} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--s2)" }}>
+            <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-sm"
                 onClick={() => setIsKeyModalOpen(false)}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-primary btn-sm"
                 disabled={liveKeyCount === 0}
                 onClick={handleApplyKeys}
               >
-                Apply {liveKeyCount > 0 ? `${liveKeyCount} keys` : "keys"}
+                <Check size={14} />
+                <span>Apply {liveKeyCount > 0 ? `${liveKeyCount} Keys` : "Keys"}</span>
               </button>
             </div>
           </div>

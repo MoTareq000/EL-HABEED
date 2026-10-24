@@ -1,5 +1,6 @@
 import React from "react";
-import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { AlertCircle, ArrowLeft, RefreshCw, Loader2 } from "lucide-react";
+import { HabeedMark } from "./HabeedLogo";
 
 type Props = {
   error: string | null;
@@ -9,41 +10,55 @@ type Props = {
 
 export function Page3Loading({ error, onRetry, onReturnToReview }: Props) {
   return (
-    <div style={{ maxWidth: "560px", margin: "var(--s6) auto", width: "100%" }}>
-      {!error ? (
-        <div className="panel-white" style={{ padding: "var(--s6) var(--s4)", textAlign: "center" }}>
-          <span className="section-eyebrow" style={{ marginBottom: "var(--s2)" }}>Stage 03</span>
-          <h2 style={{ fontSize: "var(--fs-lg)", marginBottom: "var(--s2)" }}>
-            Simulating blind guesses...
-          </h2>
-          <p style={{ maxWidth: "45ch", margin: "0 auto var(--s4)", fontSize: "var(--fs-base)" }}>
-            Evaluating option length differentials, hedging qualifiers, grammar agreement, and absolute terms without subject knowledge.
-          </p>
-          <div className="mono-num" style={{ fontSize: "13px", color: "var(--ink-3)", display: "inline-block", padding: "4px 12px", backgroundColor: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
-            Deterministic rule engine · Seed #42
+    <div className="simulation-screen">
+      <div className="simulation-card">
+        {!error ? (
+          <div>
+            <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center" }}>
+              <div style={{ position: "relative" }}>
+                <HabeedMark size={72} />
+              </div>
+            </div>
+
+            <h2 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--ink-primary)", marginBottom: "8px" }}>
+              Simulating Blind Guessing
+            </h2>
+
+            <p style={{ color: "var(--ink-secondary)", fontSize: "0.9rem", lineHeight: 1.6, maxWidth: "460px", margin: "0 auto 24px" }}>
+              EL-HABEED is evaluating option length differentials, hedging qualifiers, and absolute terms without subject-matter knowledge.
+            </p>
+
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--bg-subtle)", padding: "6px 14px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-light)" }}>
+              <Loader2 size={14} className="spinner-icon" color="var(--blaze-orange)" />
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--ink-secondary)" }}>
+                Deterministic Heuristics Engine • Seed #42
+              </span>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="panel-white" style={{ padding: "var(--s4)", borderColor: "var(--risk-border)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--s1)", color: "var(--risk)", marginBottom: "var(--s1)" }}>
-            <AlertCircle size={20} />
-            <h3 style={{ margin: 0, color: "var(--risk)" }}>Simulation error</h3>
+        ) : (
+          <div style={{ textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--blaze-orange)", marginBottom: "8px" }}>
+              <AlertCircle size={20} />
+              <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>Simulation Failed</h3>
+            </div>
+
+            <p style={{ color: "var(--ink-secondary)", fontSize: "0.92rem", lineHeight: 1.5, marginBottom: "20px" }}>
+              {error}
+            </p>
+
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button className="btn btn-primary btn-sm" type="button" onClick={onRetry}>
+                <RefreshCw size={14} />
+                <span>Retry Simulation</span>
+              </button>
+              <button className="btn btn-secondary btn-sm" type="button" onClick={onReturnToReview}>
+                <ArrowLeft size={14} />
+                <span>Return to Review</span>
+              </button>
+            </div>
           </div>
-          <p style={{ fontSize: "var(--fs-base)", marginBottom: "var(--s3)" }}>
-            {error}
-          </p>
-          <div style={{ display: "flex", gap: "var(--s2)" }}>
-            <button className="btn btn-primary" type="button" onClick={onRetry}>
-              <RefreshCw size={14} />
-              <span>Retry simulation</span>
-            </button>
-            <button className="btn btn-secondary" type="button" onClick={onReturnToReview}>
-              <ArrowLeft size={14} />
-              <span>Return to review</span>
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
