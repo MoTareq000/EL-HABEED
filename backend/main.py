@@ -4,10 +4,12 @@ import os
 import sys
 import traceback
 
-# Ensure repository root is in sys.path so 'backend.*' imports resolve when run as a standalone service
-_parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _parent not in sys.path:
-    sys.path.insert(0, _parent)
+# Ensure both service directory and parent repository root are in sys.path
+_this_dir = os.path.dirname(os.path.abspath(__file__))
+_parent = os.path.dirname(_this_dir)
+for _p in (_parent, _this_dir):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
@@ -40,6 +42,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    first_error = errors[0]["msg"] if errors else "Invalid request payload"
+    error_msg = f"Request validation error: {first_error}"
+    return JSONResponse(
+        status_code=422,
+        content={"detail": error_msg, "errors": errors},
+    )
 
 
 @app.exception_handler(ResponseValidationError)
@@ -91,11 +104,17 @@ def analyze(payload: AnalyzeRequest) -> AnalyzeResponse:
 def parse_exam_pdf_json(payload: PdfBase64Request) -> ExamParseResponse:
     """Stage A (Serverless Preferred): Ingests base64-encoded PDF without multipart form spooling issues."""
     try:
-        raw_b64 = payload.file_base64
+        raw_b64 = payload.file_base64.strip()
         if "," in raw_b64:
-            raw_b64 = raw_b64.split(",", 1)[1]
+            raw_b64 = raw_b64.split(",", 1)[1].strip()
+        if not raw_b64:
+            raise HTTPException(status_code=422, detail="Empty PDF base64 payload provided.")
         pdf_bytes = base64.b64decode(raw_b64)
-        return parse_exam_from_pdf_bytes(pdf_bytes, filename=payload.filename)
+        if not pdf_bytes:
+            raise HTTPException(status_code=422, detail="Decoded PDF file is empty (0 bytes).")
+        return parse_exam_from_pdf_bytes(pdf_bytes, filename=payload.filename or "exam.pdf")
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(
             status_code=422,

@@ -154,12 +154,30 @@ async function handleApiError(response: Response, defaultMsg: string): Promise<n
   try {
     const payload = await response.json();
     if (payload?.detail) {
-      if (typeof payload.detail === "string") detail = payload.detail;
-      else if (Array.isArray(payload.detail)) detail = payload.detail.map((d: any) => d.msg || JSON.stringify(d)).join("; ");
-      else detail = JSON.stringify(payload.detail);
+      if (typeof payload.detail === "string") {
+        detail = payload.detail;
+      } else if (Array.isArray(payload.detail)) {
+        detail = payload.detail.map((d: any) => d.msg || JSON.stringify(d)).join("; ");
+      } else {
+        detail = JSON.stringify(payload.detail);
+      }
+    } else if (payload?.traceback) {
+      detail = String(payload.traceback);
+    } else if (payload?.message) {
+      detail = String(payload.message);
+    } else if (payload?.error) {
+      detail = String(payload.error);
     }
   } catch {
-    // not JSON (e.g. HTML error page)
+    // not JSON (e.g. HTML error page or raw text)
+    try {
+      const text = await response.text();
+      if (text && text.trim().length > 0 && text.length < 500) {
+        detail = text.trim();
+      }
+    } catch {
+      // ignore
+    }
   }
 
   if (!detail) {
@@ -191,6 +209,7 @@ export async function analyzeQuestion(
 
 export async function parseExamPdf(file: File): Promise<ExamParseResponse> {
   // 1. Try base64 JSON payload first: serverless-safe, avoids multipart streaming & tempfile spooling
+  let shouldTryMultipartFallback = false;
   try {
     const base64Data = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -214,29 +233,39 @@ export async function parseExamPdf(file: File): Promise<ExamParseResponse> {
       return response.json();
     }
 
-    // If server returned 400/422 with a specific message, handle it
-    if (response.status === 400 || response.status === 422) {
+    // If 404, this deployment doesn't have the parse-pdf endpoint yet; fallback to multipart
+    if (response.status === 404) {
+      shouldTryMultipartFallback = true;
+    } else {
+      // 400, 422, 500, etc. - surface the server error detail directly
       return handleApiError(response, "Unable to parse the exam PDF.");
     }
-  } catch (err) {
-    // If client-side reading or JSON endpoint failed, try standard FormData fallback
+  } catch (err: any) {
+    if (err instanceof Error && err.message.includes("Unable to parse")) {
+      throw err;
+    }
     console.warn("Base64 upload attempt failed, trying multipart fallback:", err);
+    shouldTryMultipartFallback = true;
   }
 
   // 2. Fallback: Standard multipart/form-data
-  const formData = new FormData();
-  formData.append("file", file);
+  if (shouldTryMultipartFallback) {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const fallbackResponse = await fetch(`${API_BASE}/api/exam/parse`, {
-    method: "POST",
-    body: formData,
-  });
+    const fallbackResponse = await fetch(`${API_BASE}/api/exam/parse`, {
+      method: "POST",
+      body: formData,
+    });
 
-  if (!fallbackResponse.ok) {
-    return handleApiError(fallbackResponse, "Unable to parse the exam PDF.");
+    if (!fallbackResponse.ok) {
+      return handleApiError(fallbackResponse, "Unable to parse the exam PDF.");
+    }
+
+    return fallbackResponse.json();
   }
 
-  return fallbackResponse.json();
+  throw new Error("Unable to parse the exam PDF.");
 }
 
 
