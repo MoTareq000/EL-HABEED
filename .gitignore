@@ -14,3 +14,4 @@ backend/**/__pycache__/
 .dev-server.out.log
 .dev-server.err.log
 .kilo/
+*.tsbuildinfo
