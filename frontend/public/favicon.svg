@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="22" fill="#14213D"/>
+  <g transform="translate(-10, -5) scale(0.66)">
+    <!-- Head / Crown Outline (Blaze Orange) -->
+    <path d="M 70 62 C 70 30, 126 30, 126 62" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <!-- Blindfold Band (Acid Chartreuse) -->
+    <path d="M 65 61 C 82 55, 114 55, 131 61 C 134 69, 133 78, 129 85 C 115 84, 108 79, 98 79 C 88 79, 81 84, 67 85 C 63 78, 62 69, 65 61 Z" fill="#B8FF01"/>
+    <!-- Jaw, Neck & Shoulder (Blaze Orange) -->
+    <path d="M 72 90 C 75 103, 84 112, 95 114" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M 124 89 C 122 96, 119 101, 115 105" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M 84 110 L 84 123 C 73 128, 53 132, 48 144 L 46 164 L 78 164" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 84 123 C 92 132, 101 134, 108 134" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M 86 164 C 96 164, 105 163, 112 159" stroke="#FF5A00" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <!-- Kinetic Motion Arcs (Acid Chartreuse) -->
+    <path d="M 152 67 C 162 74, 166 86, 165 98" stroke="#B8FF01" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M 144 75 C 151 81, 155 89, 154 97" stroke="#B8FF01" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- 3D Isometric Tumbling Die -->
+    <path d="M 121 108 L 143 124 L 171 112" stroke="#FF5A00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 143 124 L 136 159" stroke="#FF5A00" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M 144 95 L 170 109 C 174 111, 175 115, 174 120 L 167 148 C 166 153, 162 156, 157 158 L 138 163 C 133 164, 128 162, 124 159 L 112 144 C 109 140, 109 135, 111 130 L 118 109 C 120 104, 125 100, 131 98 Z" stroke="#B8FF01" stroke-width="6.5" stroke-linejoin="round" fill="none"/>
+    <!-- Die Pips (Acid Chartreuse) -->
+    <circle cx="137" cy="108" r="4" fill="#B8FF01"/>
+    <circle cx="152" cy="112" r="4" fill="#B8FF01"/>
+    <circle cx="123" cy="128" r="4" fill="#B8FF01"/>
+    <circle cx="127" cy="144" r="4" fill="#B8FF01"/>
+    <circle cx="161" cy="127" r="4" fill="#B8FF01"/>
+    <circle cx="154" cy="138" r="4" fill="#B8FF01"/>
+    <circle cx="146" cy="149" r="4" fill="#B8FF01"/>
+  </g>
+</svg>
