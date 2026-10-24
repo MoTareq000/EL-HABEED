@@ -1,14 +1,18 @@
+import base64
 import json
 import os
 import sys
+import traceback
 
 # Ensure repository root is in sys.path so 'backend.*' imports resolve when run as a standalone service
 _parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _parent not in sys.path:
     sys.path.insert(0, _parent)
 
-from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from backend.models.exam import (
@@ -38,9 +42,35 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(ResponseValidationError)
+async def response_validation_exception_handler(request: Request, exc: ResponseValidationError):
+    error_msg = f"Response schema validation error: {str(exc)}"
+    print(f"[ERROR] {error_msg}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": error_msg, "errors": exc.errors()},
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exc()
+    error_msg = f"Internal server error ({type(exc).__name__}): {str(exc)}"
+    print(f"[UNHANDLED EXCEPTION]\n{tb}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": error_msg, "traceback": tb},
+    )
+
+
 class TextParseRequest(BaseModel):
     raw_text: str
     filename: str = "Pasted Exam"
+
+
+class PdfBase64Request(BaseModel):
+    filename: str = "exam.pdf"
+    file_base64: str
 
 
 router = APIRouter()
@@ -55,6 +85,22 @@ def health() -> dict[str, str]:
 def analyze(payload: AnalyzeRequest) -> AnalyzeResponse:
     """Analyze a single question (MCQ or True/False) with deterministic rule scoring and seeded tie-breaker."""
     return analyze_question(payload)
+
+
+@router.post("/exam/parse-pdf", response_model=ExamParseResponse)
+def parse_exam_pdf_json(payload: PdfBase64Request) -> ExamParseResponse:
+    """Stage A (Serverless Preferred): Ingests base64-encoded PDF without multipart form spooling issues."""
+    try:
+        raw_b64 = payload.file_base64
+        if "," in raw_b64:
+            raw_b64 = raw_b64.split(",", 1)[1]
+        pdf_bytes = base64.b64decode(raw_b64)
+        return parse_exam_from_pdf_bytes(pdf_bytes, filename=payload.filename)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unable to parse exam PDF: {str(exc)}",
+        ) from exc
 
 
 @router.post("/exam/parse", response_model=ExamParseResponse)
