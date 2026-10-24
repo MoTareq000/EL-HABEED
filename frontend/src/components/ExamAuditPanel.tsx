@@ -77,10 +77,10 @@ export function ExamAuditPanel({ initialSampleText }: ExamAuditPanelProps = {}) 
   }
 
   const steps = [
-    { num: 1, label: "Stage 01", title: "Upload & Ingest" },
-    { num: 2, label: "Stage 02", title: "Review & Answer Key" },
-    { num: 3, label: "Stage 03", title: "Blind Simulation" },
-    { num: 4, label: "Stage 04", title: "Vulnerability Audit" },
+    { num: 1, label: "01", title: "Upload & ingest" },
+    { num: 2, label: "02", title: "Review & answer key" },
+    { num: 3, label: "03", title: "Blind simulation" },
+    { num: 4, label: "04", title: "Audit results" },
   ];
 
   return (
@@ -110,7 +110,7 @@ export function ExamAuditPanel({ initialSampleText }: ExamAuditPanelProps = {}) 
               </div>
               <div className="stepper-step-title">
                 <span>{step.title}</span>
-                {isDone && <Check size={14} color="var(--blaze-orange)" />}
+                {isDone && <Check size={14} color="var(--ok)" strokeWidth={2.5} />}
               </div>
             </button>
           );
@@ -150,3 +150,4 @@ export function ExamAuditPanel({ initialSampleText }: ExamAuditPanelProps = {}) 
     </div>
   );
 }
+
