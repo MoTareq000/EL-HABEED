@@ -74,6 +74,21 @@ OPPOSITE_PAIRS = (
     ("prefix", "postfix"),
 )
 
+COMMON_STEM_ASSOCIATIONS: dict[str, set[str]] = {
+    "language": {"python", "java", "c", "c++", "javascript", "html", "sql", "pascal", "ruby", "rust", "swift"},
+    "programming": {"python", "java", "c", "c++", "code", "coding", "compiler", "interpreter"},
+    "decision": {"diamond", "if", "else", "if/else", "conditional", "condition", "branch", "boolean"},
+    "loop": {"repeat", "repeating", "repetition", "iteration", "iterate", "while", "for", "cycle"},
+    "input": {"enter", "entering", "entered", "keyboard", "read", "reading", "type", "typing", "scanner"},
+    "output": {"print", "printing", "display", "displaying", "show", "showing", "screen", "result"},
+    "symbol": {"diamond", "rectangle", "oval", "parallelogram"},
+    "flowchart": {"diamond", "rectangle", "oval", "parallelogram", "process", "decision", "start", "end"},
+}
+
+
+def _word_count(text: str) -> int:
+    return len(re.findall(r"[a-zA-Z0-9']+", text))
+
 
 def longest_answer_rule(
     question: str, choices: list[str], scores: list[int], reasons: list[RuleReason]
@@ -88,9 +103,18 @@ def longest_answer_rule(
 
     top_len = len(top_choice.strip())
     second_len = len(second_choice.strip())
+    top_words = _word_count(top_choice)
+    second_words = _word_count(second_choice)
 
-    # Require top choice to be strictly longer by at least 15% or at least 4 chars, with min length 8
-    if top_len > second_len and (top_len >= second_len * 1.15 or top_len - second_len >= 4) and top_len >= 8:
+    # Psychometric item-writing safeguard:
+    # 1. Single or two-word choices (e.g. Parallelogram vs Rectangle) vary due to English vocabulary, not teacher elaboration.
+    # 2. Genuine length flaw requires multiple words (>= 3 words), more words than competitors, and a significant character margin (>= 10 chars).
+    if (
+        top_words >= 3
+        and top_len > second_len
+        and top_words > second_words
+        and (top_len >= second_len * 1.25 and top_len - second_len >= 10)
+    ):
         _add(
             scores,
             reasons,
@@ -98,7 +122,7 @@ def longest_answer_rule(
             2,
             "longest_answer",
             "Longest Answer",
-            f"Longest answer ({top_len} chars): {top_choice}",
+            f"Longest answer ({top_len} chars, {top_words} words): {top_choice}",
             evidence=f"Length: {top_len} chars vs 2nd longest {second_len} chars",
             limitation="Examiners often elaborate correct answers with qualifiers, but length alone does not prove correctness.",
             overlap_group="surface_form",
@@ -349,14 +373,36 @@ def grammar_match_rule(
 def keyword_overlap_rule(
     question: str, choices: list[str], scores: list[int], reasons: list[RuleReason]
 ) -> None:
-    """MCQ-10: Award points for distinctive stem keyword overlap (up to +3 per option)."""
-    keywords = _word_set(question) - STOPWORDS - MODERATE_WORDS - ABSOLUTE_WORDS
-    keywords = {word for word in keywords if len(word) > 3}
+    """MCQ-10: Award points for distinctive stem keyword and conceptual association overlap (up to +3 per option)."""
+    q_words = _word_set(question) - STOPWORDS - MODERATE_WORDS - ABSOLUTE_WORDS
+    keywords = {word for word in q_words if len(word) > 2}
     if not keywords:
         return
 
     for index, choice in enumerate(choices):
-        matches = sorted(keywords & _word_set(choice))
+        c_words = _word_set(choice)
+        matches: set[str] = set()
+
+        # 1. Exact keyword overlap
+        for kw in keywords:
+            if kw in c_words:
+                matches.add(kw)
+
+        # 2. Stem/prefix root matching (e.g. program/programming, loop/loops, repeat/repeating)
+        for kw in keywords:
+            if len(kw) >= 4:
+                for cw in c_words:
+                    if len(cw) >= 4 and (kw.startswith(cw[:4]) or cw.startswith(kw[:4])):
+                        if abs(len(kw) - len(cw)) <= 4:
+                            matches.add(f"{kw}~{cw}")
+
+        # 3. Domain conceptual associations (e.g. language -> python, decision -> diamond/if/else, loop -> repeat)
+        for kw in keywords:
+            if kw in COMMON_STEM_ASSOCIATIONS:
+                assoc = COMMON_STEM_ASSOCIATIONS[kw]
+                if assoc & c_words or any(a in choice.lower() for a in assoc):
+                    matches.add(f"{kw}→concept")
+
         if matches:
             delta = min(len(matches), 3)
             _add(
@@ -365,9 +411,9 @@ def keyword_overlap_rule(
                 index,
                 delta,
                 "keyword_overlap",
-                "Keyword Match",
-                f"Matches question keyword: {', '.join(matches[:3])}",
-                evidence=f"Stem-choice keyword overlap: '{', '.join(matches[:3])}'",
+                "Keyword / Concept Match",
+                f"Matches question keywords/concepts: {', '.join(sorted(matches)[:3])}",
+                evidence=f"Stem-choice alignment: '{', '.join(sorted(matches)[:3])}'",
                 limitation="Test-takers are frequently lured by distractors echoing familiar question terminology.",
                 overlap_group="content",
             )
