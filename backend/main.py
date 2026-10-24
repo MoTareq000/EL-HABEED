@@ -1,4 +1,12 @@
 import json
+import os
+import sys
+
+# Ensure repository root is in sys.path so 'backend.*' imports resolve when run as a standalone service
+_parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _parent not in sys.path:
+    sys.path.insert(0, _parent)
+
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
