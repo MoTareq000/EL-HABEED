@@ -149,6 +149,26 @@ const API_BASE =
   import.meta.env.VITE_API_BASE_URL ??
   (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
 
+async function handleApiError(response: Response, defaultMsg: string): Promise<never> {
+  let detail: string | null = null;
+  try {
+    const payload = await response.json();
+    if (payload?.detail) {
+      if (typeof payload.detail === "string") detail = payload.detail;
+      else if (Array.isArray(payload.detail)) detail = payload.detail.map((d: any) => d.msg || JSON.stringify(d)).join("; ");
+      else detail = JSON.stringify(payload.detail);
+    }
+  } catch {
+    // not JSON (e.g. HTML error page)
+  }
+
+  if (!detail) {
+    detail = `${defaultMsg} (Server returned HTTP ${response.status} ${response.statusText || ""})`.trim();
+  }
+
+  throw new Error(detail);
+}
+
 export async function analyzeQuestion(
   questionType: QuestionType,
   rawText: string,
@@ -163,8 +183,7 @@ export async function analyzeQuestion(
   });
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(payload?.detail ?? "Unable to analyze the question.");
+    return handleApiError(response, "Unable to analyze the question.");
   }
 
   return response.json();
@@ -180,8 +199,7 @@ export async function parseExamPdf(file: File): Promise<ExamParseResponse> {
   });
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(payload?.detail ?? "Unable to parse the exam PDF.");
+    return handleApiError(response, "Unable to parse the exam PDF.");
   }
 
   return response.json();
@@ -200,8 +218,7 @@ export async function parseExamText(
   });
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(payload?.detail ?? "Unable to parse exam text.");
+    return handleApiError(response, "Unable to parse exam text.");
   }
 
   return response.json();
@@ -227,8 +244,7 @@ export async function auditReviewedExam(
   });
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(payload?.detail ?? "Unable to complete exam audit.");
+    return handleApiError(response, "Unable to complete exam audit.");
   }
 
   return response.json();
@@ -251,12 +267,12 @@ export async function uploadExamPdf(
   });
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(payload?.detail ?? "Unable to analyze the exam PDF.");
+    return handleApiError(response, "Unable to analyze the exam PDF.");
   }
 
   return response.json();
 }
+
 
 export async function analyzeExamText(
   rawText: string,
