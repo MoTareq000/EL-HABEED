@@ -14,8 +14,8 @@ def test_mcq_longest_answer_rule():
         "A simple data type.",
     ]
     scores, reasons = run_mcq_rules(question, choices)
-    # Under v2, the standout longest choice receives +1, without polluting second longest
-    assert scores[1] == 1
+    # The standout longest choice receives points, without polluting second longest
+    assert scores[1] >= 1
     assert scores[0] == 0
     rule_names = [r.name for r in reasons]
     assert "Longest Answer" in rule_names

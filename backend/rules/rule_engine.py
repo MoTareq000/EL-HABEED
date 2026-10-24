@@ -29,15 +29,16 @@ TF_RULES: list[TfRule] = [
     tf_rules.multiple_negatives_rule,
 ]
 
-# NEW-04 Overlap Group Limits
+# Overlap Group Limits to prevent uncalibrated runaway stacking while maintaining decisive distinction
 OVERLAP_GROUP_CAPS: dict[str, tuple[int, int]] = {
     # (min_negative_cap, max_positive_cap)
-    "wording": (-1, 2),
-    "combined_answers": (0, 1),
-    "surface_form": (0, 1),
-    "grammar": (0, 2),
-    "option_relationships": (0, 0),
-    "numeric": (0, 0),
+    "wording": (-4, 3),
+    "combined_answers": (0, 3),
+    "surface_form": (0, 3),
+    "grammar": (0, 3),
+    "option_relationships": (0, 2),
+    "numeric": (-2, 2),
+    "content": (0, 3),
 }
 
 

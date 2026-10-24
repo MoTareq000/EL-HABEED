@@ -9,14 +9,14 @@ NEGATIVE_WORDS = {"not", "cannot", "isn't", "aren't", "won't", "unlikely"}
 
 
 def absolute_words_rule(statement: str, scores: dict[str, int], reasons: list[RuleReason]) -> None:
-    """TF-01: Award +1 to False if the statement contains rigid absolute assertions (capped at +1)."""
+    """TF-01: Award +3 to False if the statement contains rigid absolute assertions."""
     words = sorted(_find_words(statement, ABSOLUTE_WORDS))
     if words:
         _add(
             scores,
             reasons,
             "False",
-            1,
+            3,
             "absolute_words",
             "Absolute Words",
             f'Contains absolute wording: "{", ".join(words)}"',
@@ -27,14 +27,14 @@ def absolute_words_rule(statement: str, scores: dict[str, int], reasons: list[Ru
 
 
 def moderate_words_rule(statement: str, scores: dict[str, int], reasons: list[RuleReason]) -> None:
-    """TF-02: Award +1 to True if the statement contains qualifying language (capped at +1)."""
+    """TF-02: Award +2 to True if the statement contains qualifying language."""
     words = sorted(_find_words(statement, MODERATE_WORDS))
     if words:
         _add(
             scores,
             reasons,
             "True",
-            1,
+            2,
             "moderate_words",
             "Moderate Words",
             f'Contains qualifying language: "{", ".join(words)}"',
